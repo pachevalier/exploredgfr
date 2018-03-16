@@ -1,0 +1,52 @@
+---
+layout: post
+title: "Les maisons de services au public"
+categories: [jekyll, rstats]
+tags: [blogdown, knitr, servr, httpuv, websocket]
+---
+
+```{r setup, include=FALSE}
+library("curl")
+library("readr")
+library("tricky")
+library("dplyr")
+library("devtools")
+#install_github("joelgombin/banR", ref = "pac-codepostal")
+library("banR")
+library("leaflet")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r download}
+curl_download(
+  url = "https://www.data.gouv.fr/s/resources/fiches-didentite-des-maisons-de-services-au-public/20180228-102624/MSAP-20180216.csv",
+  destfile = "../data-raw/maisons_service_public.csv"
+  )
+```
+
+```{bash iconv}
+iconv -f "windows-1252" -t utf-8 ../data-raw/maisons_service_public.csv > ../data-raw/msap_utf8.csv
+```
+
+```{r}
+table_msap <- read_csv2("../data-raw/msap_utf8.csv") %>%
+  set_standard_names()
+```
+
+```{r}
+table_msap %>% glimpse()
+```
+
+
+```{r geocode}
+table_msap_geo <- geocode_tbl(tbl = table_msap, adresse = adresse, code_postal = code_postal )
+```
+
+```{r}
+table_msap_geo %>% readr::write_csv(path = "../data-raw/masp_utf8_geo.csv")
+```
+
+```{r}
+
+```
+
